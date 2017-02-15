@@ -175,7 +175,6 @@ struct message_type
 {
     opcode value;
 
-    explicit
     message_type(opcode op)
     {
         if(op != opcode::binary && op != opcode::text)
