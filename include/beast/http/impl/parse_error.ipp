@@ -8,15 +8,21 @@
 #ifndef BEAST_HTTP_IMPL_PARSE_ERROR_IPP
 #define BEAST_HTTP_IMPL_PARSE_ERROR_IPP
 
+#ifndef BOOST_ASIO_USE_STD_SYSTEM_ERROR
 namespace boost {
 namespace system {
+#else
+namespace std {
+#endif
 template<>
 struct is_error_code_enum<beast::http::parse_error>
 {
     static bool const value = true;
 };
+#ifndef BOOST_ASIO_USE_STD_SYSTEM_ERROR
 } // system
-} // boost
+#endif
+} // boost or std
 
 namespace beast {
 namespace http {

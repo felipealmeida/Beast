@@ -114,14 +114,14 @@ read_some_op<MutableBufferSequence, Handler>::operator()(
         case 1:
             // read (unbuffered)
             d.state = 99;
-            d.srs.next_layer_.async_read_some(
+            beast::unwrap_ref(d.srs.next_layer_).async_read_some(
                 d.bs, std::move(*this));
             return;
 
         case 2:
             // read
             d.state = 3;
-            d.srs.next_layer_.async_read_some(
+            beast::unwrap_ref(d.srs.next_layer_).async_read_some(
                 d.srs.sb_.prepare(d.srs.capacity_),
                     std::move(*this));
             return;
@@ -173,7 +173,7 @@ async_write_some(ConstBufferSequence const& buffers,
     static_assert(is_CompletionHandler<WriteHandler,
         void(error_code, std::size_t)>::value,
             "WriteHandler requirements not met");
-    return next_layer_.async_write_some(buffers,
+    return beast::unwrap_ref(next_layer_).async_write_some(buffers,
         std::forward<WriteHandler>(handler));
 }
 

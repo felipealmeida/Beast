@@ -10,7 +10,6 @@
 
 #include <beast/core/buffer_concepts.hpp>
 #include <beast/core/error.hpp>
-#include <boost/asio/io_service.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -24,58 +23,7 @@ struct StreamHandler
     StreamHandler(StreamHandler const&) = default;
     void operator()(error_code ec, std::size_t);
 };
-using ReadHandler = StreamHandler;
-using WriteHandler = StreamHandler;
-
-template<class T>
-class has_get_io_service
-{
-    template<class U, class R = typename std::is_same<
-        decltype(std::declval<U>().get_io_service()),
-            boost::asio::io_service&>>
-    static R check(int);
-    template<class>
-    static std::false_type check(...);
-public:
-    using type = decltype(check<T>(0));
-};
-
-template<class T>
-class is_AsyncReadStream
-{
-    template<class U, class R = decltype(
-        std::declval<U>().async_read_some(
-            std::declval<MutableBufferSequence>(),
-                std::declval<ReadHandler>()),
-                    std::true_type{})>
-    static R check(int);
-    template<class>
-    static std::false_type check(...);
-    using type1 = decltype(check<T>(0));
-public:
-    using type = std::integral_constant<bool,
-        type1::value &&
-        has_get_io_service<T>::type::value>;
-};
-
-template<class T>
-class is_AsyncWriteStream
-{
-    template<class U, class R = decltype(
-        std::declval<U>().async_write_some(
-            std::declval<ConstBufferSequence>(),
-                std::declval<WriteHandler>()),
-                    std::true_type{})>
-    static R check(int);
-    template<class>
-    static std::false_type check(...);
-    using type1 = decltype(check<T>(0));
-public:
-    using type = std::integral_constant<bool,
-        type1::value &&
-        has_get_io_service<T>::type::value>;
-};
-
+  
 template<class T>
 class is_SyncReadStream
 {

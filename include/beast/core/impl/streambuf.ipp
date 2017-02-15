@@ -11,6 +11,7 @@
 #include <beast/core/detail/type_traits.hpp>
 #include <beast/core/detail/write_dynabuf.hpp>
 #include <boost/assert.hpp>
+#include <boost/throw_exception.hpp>
 #include <algorithm>
 #include <exception>
 #include <sstream>
@@ -524,8 +525,8 @@ basic_streambuf<Allocator>::basic_streambuf(
     , alloc_size_(alloc_size)
 {
     if(alloc_size <= 0)
-        throw detail::make_exception<std::invalid_argument>(
-            "invalid alloc_size", __FILE__, __LINE__);
+      BOOST_THROW_EXCEPTION(detail::make_exceptions<std::invalid_argument>
+                            ("basic_streambuf: invalid alloc_size"));
 }
 
 template<class Allocator>

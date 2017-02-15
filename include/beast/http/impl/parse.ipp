@@ -8,12 +8,18 @@
 #ifndef BEAST_HTTP_IMPL_PARSE_IPP_HPP
 #define BEAST_HTTP_IMPL_PARSE_IPP_HPP
 
+#ifdef BEAST_MISC_ERROR
+#include <boost/asio/misc_error.hpp>
+#else
+#include <boost/asio/error.hpp>
+#endif
 #include <beast/http/concepts.hpp>
 #include <beast/core/bind_handler.hpp>
 #include <beast/core/handler_helpers.hpp>
 #include <beast/core/handler_ptr.hpp>
 #include <beast/core/stream_concepts.hpp>
 #include <boost/assert.hpp>
+#include <boost/throw_exception.hpp>
 
 namespace beast {
 namespace http {
@@ -229,7 +235,7 @@ parse(SyncReadStream& stream,
     error_code ec;
     parse(stream, dynabuf, parser, ec);
     if(ec)
-        throw system_error{ec};
+      BOOST_THROW_EXCEPTION(system_error{ec});
 }
 
 template<class SyncReadStream, class DynamicBuffer, class Parser>
@@ -273,27 +279,6 @@ parse(SyncReadStream& stream, DynamicBuffer& dynabuf,
             break;
         }
     }
-}
-
-template<class AsyncReadStream,
-    class DynamicBuffer, class Parser, class ReadHandler>
-typename async_completion<
-    ReadHandler, void(error_code)>::result_type
-async_parse(AsyncReadStream& stream,
-    DynamicBuffer& dynabuf, Parser& parser, ReadHandler&& handler)
-{
-    static_assert(is_AsyncReadStream<AsyncReadStream>::value,
-        "AsyncReadStream requirements not met");
-    static_assert(is_DynamicBuffer<DynamicBuffer>::value,
-        "DynamicBuffer requirements not met");
-    static_assert(is_Parser<Parser>::value,
-        "Parser requirements not met");
-    beast::async_completion<ReadHandler,
-        void(error_code)> completion{handler};
-    detail::parse_op<AsyncReadStream, DynamicBuffer,
-        Parser, decltype(completion.handler)>{
-            completion.handler, stream, dynabuf, parser};
-    return completion.result.get();
 }
 
 } // http

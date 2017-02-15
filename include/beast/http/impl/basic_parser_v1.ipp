@@ -160,12 +160,12 @@ write(boost::asio::const_buffer const& buffer, error_code& ec)
         return 0;
 
     auto begin =
-        reinterpret_cast<char const*>(data);
+        static_cast<char const*>(data);
     auto const end = begin + size;
     auto p = begin;
     auto used = [&]
     {
-        return p - reinterpret_cast<char const*>(data);
+        return p - static_cast<char const*>(data);
     };
     auto err = [&](parse_error ev)
     {

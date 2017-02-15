@@ -16,6 +16,7 @@
 #include <beast/core/handler_helpers.hpp>
 #include <beast/core/handler_ptr.hpp>
 #include <beast/core/stream_concepts.hpp>
+#include <beast/core/async_stream_concepts.hpp>
 #include <boost/assert.hpp>
 
 namespace beast {

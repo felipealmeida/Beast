@@ -149,6 +149,10 @@ async_parse(AsyncReadStream& stream, DynamicBuffer& dynabuf,
 } // http
 } // beast
 
+#ifndef BEAST_HEADER_ONLY
 #include <beast/http/impl/parse.ipp>
+#include <beast/http/impl/async_parse.ipp>
+#endif
+
 
 #endif
