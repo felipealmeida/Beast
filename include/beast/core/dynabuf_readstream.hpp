@@ -11,6 +11,7 @@
 #include <beast/core/async_completion.hpp>
 #include <beast/core/buffer_concepts.hpp>
 #include <beast/core/error.hpp>
+#include <beast/core/ref.hpp>
 #include <beast/core/stream_concepts.hpp>
 #include <beast/core/streambuf.hpp>
 #include <beast/core/detail/get_lowest_layer.hpp>
@@ -97,7 +98,7 @@ class dynabuf_readstream
 
     DynamicBuffer sb_;
     std::size_t capacity_ = 0;
-    Stream next_layer_;
+    typename std::conditional<std::is_reference<Stream>::value, std::reference_wrapper<typename std::remove_reference<Stream>::type>, Stream>::type next_layer_;
 
 public:
     /// The type of the internal buffer
@@ -163,7 +164,7 @@ public:
     boost::asio::io_service&
     get_io_service()
     {
-        return next_layer_.get_io_service();
+       return beast::unwrap_ref(next_layer_).get_io_service();
     }
 
     /** Access the internal buffer.
@@ -312,7 +313,7 @@ public:
     {
         static_assert(is_SyncWriteStream<next_layer_type>::value,
             "SyncWriteStream requirements not met");
-        return next_layer_.write_some(buffers, ec);
+        return beast::unwrap_ref(next_layer_).write_some(buffers, ec);
     }
 
     /** Start an asynchronous write.
